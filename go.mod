@@ -1,1 +1,3 @@
-module "restapi_server"
+module restapi_server
+
+go 1.14
