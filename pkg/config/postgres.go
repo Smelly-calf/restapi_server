@@ -1,8 +1,9 @@
 package config
 
 const (
-	pgAddr     = "localhost:5432"
-	pgUser     = "postgres"
-	pgPassword = "root"
-	pgDbname   = "runoobdb"
+	PgHost     = "localhost"
+	PgPort     = 5432
+	PgUser     = "postgres"
+	PgPassword = "root"
+	PgRunoobdb = "runoobdb"
 )
