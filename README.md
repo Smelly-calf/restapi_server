@@ -8,7 +8,12 @@
 3. 无状态：每个RESTful API请求都包含了所有足够完成本次操作的信息，服务端无需保持 Session。
 
 #### 技术选型
-对象关系型数据库 PostgreSQL 和 Gin 框架。
+go 操作 pg：github.com/lib/pq；
+
+REST api 框架：github.com/gin-gonic/gin；
+
+单元测试工具：httpexpect
+
 
 #### 模块设计
 开发、测试、构建。
