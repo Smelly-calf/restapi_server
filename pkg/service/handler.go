@@ -8,7 +8,24 @@ import (
 	"time"
 )
 
+const (
+	USER         = "user"
+	RELATIONSHIP = "relationship"
+)
+
 type HttpHandler struct{}
+
+type UserSchema struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+	Type string `json:"type",default:"user"`
+}
+
+type RelationSchema struct {
+	FollowerID int    `json:"user_id"`
+	State      string `json:"state"`
+	Type       string `json:"type",default:"relationship"`
+}
 
 func (h *HttpHandler) GetUsers(c *gin.Context) *APIException {
 	flag := c.Query("flag")
@@ -17,7 +34,20 @@ func (h *HttpHandler) GetUsers(c *gin.Context) *APIException {
 		log.Println("sleep 10 second.")
 		time.Sleep(10 * time.Second)
 	}
-	users := model.SelectAllUsers()
+	ums, err := model.SelectAllUsers()
+	if err != nil {
+		return ParameterError("查询发生错误")
+	}
+
+	// 转换为 userSchema
+	users := make([]UserSchema, 0)
+	for _, u := range ums {
+		users = append(users, UserSchema{
+			ID:   u.ID,
+			Name: u.Name,
+			Type: USER,
+		})
+	}
 	c.JSON(200, users)
 	return nil
 }
@@ -28,8 +58,16 @@ func (h *HttpHandler) CreateUser(c *gin.Context) *APIException {
 	if err != nil {
 		return ParameterError("参数 name 非法")
 	}
-	user := model.InsertUser(u.Name)
-	c.JSON(200, user)
+	user, err := model.InsertUser(u.Name)
+	if err != nil {
+		return ParameterError("参数 name 非法")
+	}
+
+	c.JSON(200, UserSchema{
+		ID:   user.ID,
+		Name: user.Name,
+		Type: USER,
+	})
 	return nil
 }
 
@@ -38,8 +76,20 @@ func (h *HttpHandler) GetRelationship(c *gin.Context) *APIException {
 	if err != nil {
 		return ParameterError("参数 userID 非法")
 	}
-	res := model.DefaultRelationModel.GetRelationshipsByUserID(int(userID))
-	c.JSON(200, res)
+	models, err := model.DefaultRelationModel.GetRelationshipsByUserID(int(userID))
+	if err != nil {
+		return ParameterError("参数 userID 非法")
+	}
+
+	relations := make([]RelationSchema, 0)
+	for _, m := range models {
+		relations = append(relations, RelationSchema{
+			FollowerID: m.FollowerID,
+			State:      m.State,
+			Type:       RELATIONSHIP,
+		})
+	}
+	c.JSON(200, relations)
 	return nil
 }
 
@@ -58,7 +108,15 @@ func (h *HttpHandler) UpdateRelationship(c *gin.Context) *APIException {
 	if err != nil {
 		return ParameterError("参数 state 非法")
 	}
-	relation := model.DefaultRelationModel.UpdateRelation(int(userID), int(followerID), s.State)
-	c.JSON(200, relation)
+	relation, err := model.DefaultRelationModel.UpdateRelation(int(userID), int(followerID), s.State)
+	if err != nil {
+		return ParameterError("参数非法")
+	}
+
+	c.JSON(200, RelationSchema{
+		FollowerID: relation.FollowerID,
+		State:      relation.State,
+		Type:       RELATIONSHIP,
+	})
 	return nil
 }
