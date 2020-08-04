@@ -1,6 +1,8 @@
 package service
 
-import "net/http"
+import (
+	"net/http"
+)
 
 const (
 	ServerERROR    = 1000 // 系统错误
@@ -15,6 +17,11 @@ type APIException struct {
 	ErrorCode int    `json:"err_code"`
 	Message   string `json:"message"`
 }
+
+// 实现接口 Error
+//func (e *APIException) Error() string {
+//	return e.Message
+//}
 
 func newAPIException(code int, errorCode int, message string) *APIException {
 	return &APIException{

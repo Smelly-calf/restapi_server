@@ -16,7 +16,13 @@ type RelationshipModel struct {
 	Type       string    `json:"type",default:"relationship"`
 }
 
-func GetRelationshipsByUserID(userID int) []*RelationshipModel {
+var DefaultRelationModel RelationshipModel
+
+func init(){
+	DefaultRelationModel = RelationshipModel{}
+}
+
+func (r *RelationshipModel) GetRelationshipsByUserID(userID int) []*RelationshipModel {
 	rows, err := RunoobDB.Query("SELECT * FROM relationships WHERE user_id=$1", userID)
 	if err != nil {
 		panic(fmt.Sprintf("PG Statements Wrong: %v", err))
@@ -36,7 +42,7 @@ func GetRelationshipsByUserID(userID int) []*RelationshipModel {
 	return res
 }
 
-func GetOneRelation(userID int, followerID int) *RelationshipModel {
+func (r *RelationshipModel) GetOneRelation(userID int, followerID int) *RelationshipModel {
 	row := RunoobDB.QueryRow("SELECT * FROM relationships WHERE user_id=$1 and follower_id=$2", userID, followerID)
 	var m RelationshipModel
 	err := row.Scan(&m.ID, &m.UserID, &m.FollowerID, &m.State, &m.CreatedAt, &m.UpdatedAt)
@@ -46,7 +52,7 @@ func GetOneRelation(userID int, followerID int) *RelationshipModel {
 	return &m
 }
 
-func InsertRelationship(userID int, followerID int, state string) *RelationshipModel {
+func (r *RelationshipModel) InsertRelationship(userID int, followerID int, state string) *RelationshipModel {
 	stmt, err := RunoobDB.Prepare("INSERT INTO relationships (user_id, follower_id, state) values ($1,$2,$3)")
 	if err != nil {
 		panic(fmt.Sprintf("PG Statements Wrong: %v", err))
@@ -59,16 +65,17 @@ func InsertRelationship(userID int, followerID int, state string) *RelationshipM
 	if err != nil {
 		panic(fmt.Sprintf("PG Statements Exec Wrong: %v", err))
 	}
-	return GetOneRelation(userID, followerID)
+	return r.GetOneRelation(userID, followerID)
 }
 
-func UpdateRelation(userID int, followerID int, state string) *RelationshipModel {
+func (r *RelationshipModel) UpdateRelation(userID int, followerID int, state string) *RelationshipModel {
 	stmt, err := RunoobDB.Prepare("UPDATE relationships set state=$1 WHERE user_id=$2 AND follower_id=$3")
 	if err != nil {
 		panic(fmt.Sprintf("PG Statements Wrong: %v", err))
 	}
-	// 反向关系
-	inverse := GetOneRelation(followerID, userID)
+
+	// 判断反向关系
+	inverse := r.GetOneRelation(followerID, userID)
 	// 互相喜欢 == "matched"
 	if inverse != nil && state == "liked" && (inverse.State == "liked" || inverse.State == "matched") {
 		// 事物: 均更新为 matched
@@ -90,5 +97,5 @@ func UpdateRelation(userID int, followerID int, state string) *RelationshipModel
 	if err != nil {
 		panic(fmt.Sprintf("PG Statements Exec Wrong: %v", err))
 	}
-	return GetOneRelation(userID, followerID)
+	return r.GetOneRelation(userID, followerID)
 }
