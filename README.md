@@ -26,6 +26,8 @@ REST api 框架：github.com/gin-gonic/gin；
 
 
 #### 模块设计
+```
+
 .
 ├── Makefile    ------ 编译/构建命令
 ├── README.md   
@@ -55,3 +57,4 @@ REST api 框架：github.com/gin-gonic/gin；
     ├── model_test.go
     └── service_test.go
 
+```
