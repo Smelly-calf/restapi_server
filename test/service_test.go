@@ -70,7 +70,7 @@ func BenchmarkUpdateRelationshipAPI(b *testing.B) {
 }
 
 // BenchmarkUpdateRelationshipAPI-8   720  1488407 ns/op
-// 接口耗时大约 1.5ms，1s可处理请求量约 666, 即 QPS 约 666 .
+// 接口耗时大约 1.5ms，QPS 720.
 func BenchmarkGetRelation(b *testing.B) {
 	gin.SetMode(gin.ReleaseMode)
 
