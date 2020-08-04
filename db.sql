@@ -45,6 +45,5 @@ INSERT INTO relationships (user_id, follower_id, state) values(1, 11, 'liked');
 
 //todo index
 CREATE INDEX "idx_n" ON "users" ("name");
-
-CREATE INDEX "idx_u" ON "relationships" ("user_id");
-CREATE INDEX "idx_f" ON "relationships" ("follower_id");
+CREATE INDEX "idx_i" ON "relationships" ("user_id");
+CREATE INDEX "idx_u" ON "relationships" ("user_id", "follower_id");
