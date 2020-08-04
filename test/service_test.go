@@ -19,7 +19,10 @@ func GetEngine(t *testing.T) *httpexpect.Expect {
 	gin.SetMode(gin.TestMode)
 	if eng == nil {
 		// 加载路由到服务器
-		server := httptest.NewServer(service.GetEngine())
+		e := gin.Default()
+		r := service.NewUserRouter()
+		r.Route(e)
+		server := httptest.NewServer(e)
 		eng = httpexpect.New(t, server.URL)
 	}
 	return eng
@@ -43,7 +46,7 @@ func TestUpdateRelationshipToDisliked(t *testing.T) {
 	fmt.Printf("%+v\n", resp)
 	fmt.Printf("%+v\n", body)
 	resp.Status(http.StatusOK)
-	inverse := model.GetOneRelation(11, 1)
+	inverse := model.DefaultRelationModel.GetOneRelation(11, 1)
 	if inverse.State != "liked" {
 		t.Errorf("inverse state: %v", inverse.State)
 	}
