@@ -21,7 +21,7 @@ func run() {
 	e.Run(config.RESTPort)
 }
 
-// 仿照 tantan-backend-common 项目的 service 启动
+// 仿照 common 项目的 service 启动
 func serviceRun() {
 	s := service.NewService()
 	common.RunService(s).Wait()
