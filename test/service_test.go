@@ -46,7 +46,7 @@ func TestUpdateRelationshipToDisliked(t *testing.T) {
 	fmt.Printf("%+v\n", resp)
 	fmt.Printf("%+v\n", body)
 	resp.Status(http.StatusOK)
-	inverse := model.DefaultRelationModel.GetOneRelation(11, 1)
+	inverse, _ := model.DefaultRelationModel.GetOneRelation(11, 1)
 	if inverse.State != "liked" {
 		t.Errorf("inverse state: %v", inverse.State)
 	}
